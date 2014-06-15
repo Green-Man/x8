@@ -29,16 +29,29 @@ class X8draw(object):
         return game.status
     
     def grid(self, game):
-        self.clear()
-        if game.status == "pass":
-            print("miss key")
-        print("GRID")
+        shape = game.grid.shape
         getKey = key_pressed._Getch()
         while game.status == "ingame":
+            self.clear()
+            
+            for y in range(shape[1]*4+1):
+                if y % 4 == 0:
+                    print("# "*(4*(shape[0])+1)) 
+                else:
+                    row = []
+                    for x in range(4*(shape[0])+1):
+                        if x % 4 == 0:
+                            row.append("#")
+                        elif (x+2) % 4 == 0 and (y+2) % 4 == 0:
+                            row.append(str(game.grid[x/4-1][y/4-1]))
+                        else:
+                            row.append(" ")
+                    print(" ".join(row))
+            
             try:
                 keyPressed = getKey()
                 
-                if keyPressed == "x":
+                if keyPressed == "x" or keyPressed == "q":
                     self.clear()
                     sys.exit()
                     
@@ -48,20 +61,21 @@ class X8draw(object):
                     if secondByte == 91:
                         thirdByte = ord(getKey())
                         if thirdByte==65:
-                                print "up"
+                            game.move("up")
                         elif thirdByte==66:
-                                print "down"
+                            game.move("down")
                         elif thirdByte==67:
-                                print "right"
+                            game.move("right")
                         elif thirdByte==68:
-                                print "left"
-#                 else:
-#                     #game.status == "pass"
-#                     self.grid(game)
+                            game.move("left")
+                
+                self.grid(game)
+                
             except KeyboardInterrupt:
                 game.status = "exit"
                 sys.exit()
             except Exception, e:
+                raise e
                 game.status = "exit"
     def help(self):
         self.clear()

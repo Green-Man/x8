@@ -7,7 +7,7 @@ import main
 #import pydevd;pydevd.settrace()
 
 draw = drawer.X8draw()
-game = main.Main()
+game = main.MainGame()
 
 
 draw.welcome(game)
