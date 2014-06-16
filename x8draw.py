@@ -36,19 +36,18 @@ class X8draw(object):
             
             for y in range(shape[1]*4+1):
                 if y % 4 == 0:
-                    print("# "*(4*(shape[0])+1)) 
+                    print("# "*(4*(shape[0])+1)) #horizontal continuous line
+                elif (y+1) % 4 == 0 or (y-1) % 4 == 0:
+                    row = ("#"+7*" ")*shape[0]+"#"
+                    print(row) #horizontal row with spaces only
                 else:
                     row = []
-                    for x in range(4*(shape[0])+1):
-                        if x % 4 == 0:
-                            row.append("#")
-                        elif (x+2) % 4 == 0 and (y+2) % 4 == 0:
-                            number = str(game.grid[x/4-1][y/4-1].get())
-                            
-                            row.append(number)
-                        else:
-                            row.append(" ")
-                    print(" ".join(row))
+                    for x in range((shape[0])):
+                        number = str(game.grid[x][y/4-1].get())
+                        l = len(number)
+                        even = int(l%2 ==0)
+                        row.append("#"+((7-l)/2+even)*" "+number+(7-l)/2*" ")
+                    print("".join(row)+"#")
             
             try:
                 keyPressed = getKey()

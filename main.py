@@ -24,16 +24,15 @@ class MainGame(object):
             if iterator[0].item().get() == 0:
                 emptyCells.append(iterator.multi_index)
             iterator.iternext()
-        cellToFill = emptyCells[np.random.randint(len(emptyCells))]
-        self.grid[cellToFill] = Cell(2)
+        if len(emptyCells):
+            cellToFill = emptyCells[np.random.randint(len(emptyCells))]
+            self.grid[cellToFill] = Cell(2)
         
 
         
     def move(self, dir):
         print(dir)
-        for i in xrange(self.size):
-            for j in xrange(self.size):
-                self.grid[i,j].set(np.random.randint(4))
+        self.spawn()
         time.sleep(0.1)
 
 class Cell(object):
