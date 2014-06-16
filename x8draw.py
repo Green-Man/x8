@@ -10,7 +10,7 @@ class X8draw(object):
     def welcome(self, game):
         self.clear()
         
-        print("Press Space to continue, h to help, x to exit")
+        print("Press Space to continue, h to help, x or q to exit")
         try:
             getKey = key_pressed._Getch()
             keyPressed = getKey()
@@ -18,7 +18,7 @@ class X8draw(object):
                 game.status = "ingame"
             elif keyPressed == "h":
                 game.status = "help"
-            elif keyPressed == "x":
+            elif keyPressed == "x" or keyPressed == "q":
                 game.status = "exit"
             else:
                 game.status = "init"
@@ -43,7 +43,9 @@ class X8draw(object):
                         if x % 4 == 0:
                             row.append("#")
                         elif (x+2) % 4 == 0 and (y+2) % 4 == 0:
-                            row.append(str(game.grid[x/4-1][y/4-1]))
+                            number = str(game.grid[x/4-1][y/4-1].get())
+                            
+                            row.append(number)
                         else:
                             row.append(" ")
                     print(" ".join(row))

@@ -1,5 +1,4 @@
 import numpy as np
-import random as r
 import time
 
 class MainGame(object):
@@ -16,19 +15,19 @@ class MainGame(object):
                 self.grid[i,j] = Cell(0)
         
         self.spawn()
+        self.spawn()
         
     def spawn(self):
+        emptyCells = []
+        iterator = np.nditer(self.grid, flags=["multi_index", "refs_ok"])
+        while not iterator.finished:
+            if iterator[0].item().get() == 0:
+                emptyCells.append(iterator.multi_index)
+            iterator.iternext()
+        cellToFill = emptyCells[np.random.randint(len(emptyCells))]
+        self.grid[cellToFill] = Cell(2)
         
-        #emptyCells = []
-        #iterator = np.nditer(self.grid)
-#         while not iterator
-#             if cell.get() == 0:
-#                 emptyCells.append([])
-                
-        
-        xInit = np.random.randint(4)
-        yInit = np.random.randint(4)
-        self.grid[xInit][yInit].set(2)
+
         
     def move(self, dir):
         print(dir)
@@ -42,9 +41,9 @@ class Cell(object):
         self.value = int(v)
     def __repr__(self):
         if self.get() == 0:
-            return " "
+            return "<Zero>"
         else:
-            return str(self.get())
+            return "<"+str(self.get())+">"
             
     def set(self, v):
         self.value = int(v)
