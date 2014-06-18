@@ -43,7 +43,7 @@ class X8draw(object):
                 else:
                     row = []
                     for x in range((shape[0])):
-                        number = str(game.grid[x][y/4-1].get())
+                        number = str(game.grid[x][(y/4)])
                         l = len(number)
                         even = int(l%2 ==0)
                         row.append("#"+((7-l)/2+even)*" "+number+(7-l)/2*" ")
@@ -55,6 +55,8 @@ class X8draw(object):
                 if keyPressed == "x" or keyPressed == "q":
                     self.clear()
                     sys.exit()
+                elif keyPressed == "v":
+                    game.spawn()
                     
                 #here goes possibly not x-platform code of getting key values
                 elif ord(keyPressed) == 27:
