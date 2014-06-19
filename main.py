@@ -1,5 +1,4 @@
 import numpy as np
-import time
 
 class MainGame(object):
     def __init__(self):
@@ -27,83 +26,65 @@ class MainGame(object):
             iterator.iternext()
         if len(emptyCells):
             cellToFill = emptyCells[np.random.randint(len(emptyCells))]
-            newCell = Cell(2)
+            if np.random.random() < 0.1:
+                newCell = Cell(4)
+            else:
+                newCell = Cell(2)
             self.grid[cellToFill] = newCell
     
     
     def move(self, direction):
-        self.setUpdated(False)
         
-        #Up case
-        d = np.array((0, -1))
-        for x in xrange(self.size):
-            for y in xrange(self.size):
+        d = np.array(direction)
+        xRange = xrange(self.size)
+        yRange = xrange(self.size)
+        if d[1] > 0:
+            yRange = reversed(yRange)
+        if d[0] > 0:
+            xRange = reversed(xRange)
+        for y in yRange:
+            for x in xRange:
                 pos = (x,y)
-                if not self.grid[pos].updated:
-                    value = self.grid[pos].get()
-                    nextNonZero = self.trace(pos, -d)
-                    if nextNonZero:
-                        #print("%s -> %s" % (pos, nextNonZero))
-                        if value:
-                            #print("\t%s + %s" % (str(self.grid[pos].get()), str(self.grid[nextNonZero].get())))
-                            if self.grid[nextNonZero].get() == self.grid[pos].get():
-                                self.grid[pos].double()
-                                self.grid[nextNonZero] = Cell(0)
-                            else:
-                                nextPos = self.nextPos(pos, -d)
-                                if self.grid[nextPos] is self.grid[nextNonZero]:
-                                    self.grid[nextPos].updated = True
-                                else:
-                                    self.grid[nextPos] = self.grid[nextNonZero]
-                                    self.grid[nextPos].updated = True
-                                    self.grid[nextNonZero] = Cell(0)
-                        else:
-                            self.grid[pos] = self.grid[nextNonZero]
+                value = self.grid[pos].get()
+                nextNonZero = self.trace(pos, -d)
+                if nextNonZero:
+                    if value:
+                        if self.grid[nextNonZero].get() == self.grid[pos].get():
+                            self.grid[pos].double()
                             self.grid[nextNonZero] = Cell(0)
-                    
-        #raw_input()
-        time.sleep(0.1)
+                    else:
+                        self.grid[pos].set(self.grid[nextNonZero].get())
+                        self.grid[nextNonZero] = Cell(0)
+        self.spawn()
     
     
     def nextPos(self, p,d):
-        return tuple([p[i]+d[i] for i in (0,1)])
+        return tuple([p[i]+d[i] for i in xrange(2)])
     
     
     def trace(self, pos, direction):
-        
         currentPos = self.nextPos(pos, direction)
-        while currentPos[0]<self.size and currentPos[1]<self.size:
+        while   currentPos[0]<self.size and\
+                currentPos[1]<self.size and\
+                currentPos[0]>=0 and\
+                currentPos[1]>=0:
             if not self.grid[currentPos].get() == 0:
-                #print("%s: %s" % (str(pos), str(currentPos)))
                 return currentPos
             else:
                 currentPos = self.nextPos(currentPos, direction)
         return None
-                
-#             print("%s: %g" % (str(pos), self.grid[pos].get()))
-#         return self.grid[pos]
-
-
-    def setUpdated(self, isUpdated):
-        
-        for x in xrange(self.size):
-            for y in xrange(self.size):
-                self.grid[(x,y)].updated == isUpdated
-        
+    
+    
 class Cell(object):
     def __init__(self, v):
         self.value = int(v)
-        self.updated = False
     def __eq__(self, other):
         return other == self.value
     def __repr__(self):
         if self.get() == 0:
             return " "
         else:
-            u = ""
-            if self.updated:
-                u = "-"
-            return str(self.get())+u
+            return str(self.get())
             
     def set(self, v):
         self.value = int(v)

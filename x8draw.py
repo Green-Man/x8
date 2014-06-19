@@ -49,37 +49,29 @@ class X8draw(object):
                         row.append("#"+((7-l)/2+even)*" "+number+(7-l)/2*" ")
                     print("".join(row)+"#")
             
-            try:
-                keyPressed = getKey()
-                
-                if keyPressed == "x" or keyPressed == "q":
-                    self.clear()
-                    sys.exit()
-                elif keyPressed == "v":
-                    game.spawn()
-                    
-                #here goes possibly not x-platform code of getting key values
-                elif ord(keyPressed) == 27:
-                    secondByte = ord(getKey())
-                    if secondByte == 91:
-                        thirdByte = ord(getKey())
-                        if thirdByte==65:
-                            game.move("up")
-                        elif thirdByte==66:
-                            game.move("down")
-                        elif thirdByte==67:
-                            game.move("right")
-                        elif thirdByte==68:
-                            game.move("left")
-                
-                self.grid(game)
-                
-            except KeyboardInterrupt:
-                game.status = "exit"
+            keyPressed = getKey()
+            
+            if keyPressed == "x" or keyPressed == "q":
+                self.clear()
                 sys.exit()
-            except Exception, e:
-                raise e
-                game.status = "exit"
+                
+            #here goes possibly not x-platform code of getting key values
+            elif ord(keyPressed) == 27:
+                secondByte = ord(getKey())
+                if secondByte == 91:
+                    thirdByte = ord(getKey())
+                    if thirdByte==65:
+                        game.move((0,-1))
+                    elif thirdByte==66:
+                        game.move((0,1))
+                    elif thirdByte==67:
+                        game.move((1,0))
+                    elif thirdByte==68:
+                        game.move((-1,0))
+            
+            self.grid(game)
+    
+    
     def help(self):
         self.clear()
         print("help screen")
