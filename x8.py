@@ -1,20 +1,21 @@
 #!/usr/bin/python
-
+import sys
 
 import x8draw as drawer
 import main
 
-#import pydevd;pydevd.settrace()
+if len(sys.argv) > 1:
+    if sys.argv[1] == "-d":
+        import pydevd;pydevd.settrace()
 
 draw = drawer.X8draw()
 game = main.MainGame()
 
 
-draw.welcome(game)
+#draw.welcome(game)
 
 if game.status == "ingame":
     draw.grid(game)
-elif game.status == "help":
-    draw.help()
 else:
-    draw.clear()
+    #draw.grid(game, waitInput = False)
+    print("You lose. Looser!")

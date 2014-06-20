@@ -4,7 +4,8 @@ class MainGame(object):
     def __init__(self):
         self.dim = 2
         self.size = 4
-        self.status = "init"
+        self.status = "ingame"
+        self.emptyCells = None
         
         shape = [self.size for x in xrange(self.dim)]
         self.grid = np.zeros(shape, dtype=Cell)
@@ -16,53 +17,80 @@ class MainGame(object):
         self.spawn()
         self.spawn()
     
-    
     def spawn(self):
-        emptyCells = []
+        self.emptyCells = []
         iterator = np.nditer(self.grid, flags=["multi_index", "refs_ok"])
         while not iterator.finished:
             if iterator[0].item().get() == 0:
-                emptyCells.append(iterator.multi_index)
+                self.emptyCells.append(iterator.multi_index)
             iterator.iternext()
-        if len(emptyCells):
-            cellToFill = emptyCells[np.random.randint(len(emptyCells))]
+        if len(self.emptyCells):
+            cellToFill = self.emptyCells[np.random.randint(len(self.emptyCells))]
             if np.random.random() < 0.1:
                 newCell = Cell(4)
             else:
                 newCell = Cell(2)
             self.grid[cellToFill] = newCell
+            return True
+        else:
+            return False
     
     
-    def move(self, direction):
-        
+    def move(self, direction, fake=False):
+        self.isMoved = False
         d = np.array(direction)
-        xRange = xrange(self.size)
-        yRange = xrange(self.size)
+        xRange = range(self.size)
+        yRange = range(self.size)
         if d[1] > 0:
-            yRange = reversed(yRange)
+            yRange =  [val for val in reversed(yRange)]
         if d[0] > 0:
-            xRange = reversed(xRange)
-        for y in yRange:
-            for x in xRange:
-                pos = (x,y)
-                value = self.grid[pos].get()
-                nextNonZero = self.trace(pos, -d)
-                if nextNonZero:
-                    if value:
-                        if self.grid[nextNonZero].get() == self.grid[pos].get():
+            xRange = [val for val in reversed(xRange)]
+        
+        def merge(pos, d):
+            value = self.grid[pos].get()
+            nextNonZero = self.nextNonZeroPos(pos, d)
+            if nextNonZero:
+                if value:
+                    if self.grid[nextNonZero].get() == self.grid[pos].get():
+                        if not fake:
                             self.grid[pos].double()
                             self.grid[nextNonZero] = Cell(0)
-                    else:
+                        self.isMoved = True
+                else:
+                    if not fake:
                         self.grid[pos].set(self.grid[nextNonZero].get())
                         self.grid[nextNonZero] = Cell(0)
-        self.spawn()
+                    self.isMoved = True
+                    if not fake:
+                        currentTracePos = yRange.index(pos[1])
+                        for  yt in yRange[currentTracePos:]:
+                            merge((pos[0], yt), d)
+        
+        for x in xRange:
+            for y in yRange:
+                pos = (x,y)
+                merge(pos, -d)
+        
+        if not fake:
+            if self.isMoved:
+                self.spawn()
+            if not self.isMoved:
+                if not self.isMovePossible():
+                    self.status = "lose"
     
+    def isMovePossible(self):
+        for tryDir in [(0,1), (0,-1), (1,0), (-1,0),]:
+            dirct = tryDir
+            self.move(dirct, fake=True)
+            if self.isMoved:
+                break
+        return self.isMoved
     
     def nextPos(self, p,d):
         return tuple([p[i]+d[i] for i in xrange(2)])
     
     
-    def trace(self, pos, direction):
+    def nextNonZeroPos(self, pos, direction):
         currentPos = self.nextPos(pos, direction)
         while   currentPos[0]<self.size and\
                 currentPos[1]<self.size and\
